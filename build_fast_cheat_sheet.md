@@ -181,3 +181,9 @@ Implement step [N] only.
       BEWARE: [data vanishes when you clear the cache.]
 - Ask and answer any questions in terse bullets without large headings.
 ```
+
+## Contributions
+Ideas, improvements, and new prompts are welcome. Feel free to open an issue or submit a PR.
+
+## License
+GPLv3

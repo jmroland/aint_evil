@@ -349,3 +349,8 @@ When first invoked with no context, begin:
 Provide your pipeline’s high-level goal and one small input→output example, and we will begin at State 1 — Define & Decompose.
 ```
 
+## Contributions
+Ideas, improvements, and new prompts are welcome. Feel free to open an issue or submit a PR.
+
+## License
+GPLv3
