@@ -97,19 +97,37 @@ $TEST_CMD 2>&1 | ollama run mistral "Format this test output as a bug report: wh
 See attached Rules.md for full rules.
 Critical reminders: single file, under 100 lines, no error handling unless asked.
 
-I want to build: [description from Flow Contract]
+See attached Rules.md.
 
-Don't write any code yet. Give me a numbered plan:
-- What you'll build
-- What each function does
-- What data flows where
+I want to build: [prose description, as messy as you want]
 
-Keep it under 15 lines. Flag anything unclear.
+Convert this into a flow contract using this format:
+Given [precondition] → When [trigger] → Then [outcome + what user sees]
 
-Output the plan in this exact format, nothing else:
+One row per step. Happy path only. Ask if unclear. Do NOT write code.
+
+```
+
+```javascript
+Here's the agreed flow contract:
+[paste the approved Given-When-Then rows]
+
+Output the plan in this exact format:
+
+DONE WHEN: [observable behaviors that prove it works]
+
+FUNCTIONS:
 1. [function] — [purpose ≤10 words] — [inputs → outputs] — [side effects, if any] — [what user sees]
-2. IF there are states, create a transition table with a column noting which function enforces them.
-3. NO code, NO pseudocode, NO explanations
+
+STATES (if applicable):
+| State | Action/Guard | Next State | Enforced by |
+
+BUILD ORDER (max 9 steps):
+1. [what to build first and why]
+
+KEY ASSUMPTIONS: [any data shape, external API, or dependency the plan relies on]
+
+Happy path only. Ask if unclear. Do NOT write code.
 ```
 
 ### PHASE 2 — SLICE 0 VERIFICATION (first time LLM sees this design)
