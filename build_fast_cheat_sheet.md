@@ -88,7 +88,7 @@ and have it test its own work via browser, test suites, or bash.
 
 ### EXAMPLE Slash Commands, Aliases, and Local LLM Prompts
 
-```markdown
+```other
 alias t="clear && $TEST_CMD 2>&1 | tee /tmp/last-test.txt && cat /tmp/last-test.txt | pbcopy"
 cat prompt.txt | ollama run mistral "Does this prompt ask for exactly one change? Does it include constraints? Flag anything vague."
 diff old.js new.js | ollama run mistral "Write a one-line changelog entry for this change." >> changelog.txt
@@ -99,16 +99,11 @@ $TEST_CMD 2>&1 | ollama run mistral "Format this test output as a bug report: wh
 
 ### PHASE 1 — PLAN (no code yet)
 
-```markdown
+```other
 [upload Rules.md]
 ```
 
-```markdown
-See attached Rules.md for full rules.
-Critical reminders: single file, under 100 lines, no error handling unless asked.
-
-See attached Rules.md.
-
+```other
 I want to build: [prose description, as messy as you want]
 
 Convert this into a flow contract using this format:
@@ -116,36 +111,54 @@ Given [precondition] → When [trigger] → Then [outcome + what user sees]
 
 One row per step. Happy path only. Ask if unclear. Do NOT write code.
 
+## PROCESS INSTRUCTIONS
+
+- Be CRITICAL — pull no punches.
+- Be CREATIVE.
+- Explore 1-2 alternative approaches and decide on the best approach.
+  Briefly note at the end which alternatives you explored using this format:
+    - If you decide to [wire up a SQLite database hoping its query power
+      would pay off later], say "turn to page 42".
+      BEWARE: [you'll find yourself debugging schema migrations].
+    - If you decide to [go with browser localStorage betting on zero
+      back-end], say "turn to page 71".
+      BEWARE: [data vanishes when you clear the cache.]
+- Ask and answer any questions in terse bullets without large headings.
+
 ```
 
-```javascript
+```markdown
 Here's the agreed flow contract:
 [paste the approved Given-When-Then rows]
 
 Output the plan in this exact format:
 
-DONE WHEN: [observable behaviors that prove it works]
+# Plan
+
+SMOKE TEST: [one sentence — what you'd show someone to prove it works]
 
 STATES (if applicable):
 | State | Action/Guard | Next State | Enforced by |
 
-FUNCTIONS:
-1. [function] — [purpose ≤10 words] — [inputs → outputs] — [side effects, if any] — [what user sees]
+KEY ASSUMPTIONS: 
+- [any data shape, external API, or dependency the plan relies on]
 
-KEY ASSUMPTIONS: [any data shape, external API, or dependency the plan relies on]
+SKELETON
+[function signatures, transition table as data structure,
+orchestration pipeline, all bodies throw "not implemented"]
+
+TESTS
+[property-based tests for each function + transition table]
 
 Happy path only. Ask if unclear. Do NOT write code.
-```
 
-```markdown
-Below is the agreed plan. Write a skeleton. Do NOT implement any logic.
-
+# Constraints
 ### Skeleton Structure
 - Pure function signatures: data in → data out, no side effects
 - Input/output types noted in comments
 - Every function body: throw "not implemented"
 - Transition table (if applicable) as a data structure, enforced
-- Orchestration at top level as a pipeline: input → fn1 → fn2 → output (all side effects here only)
+- Orchestration at top level as a pipeline (all side effects only here: input → fn1 → fn2 → output (all side effects here only)
 - Use language idioms where significantly more robust, readable, or simple
 
 ### Tests (generate alongside skeleton)
@@ -153,47 +166,28 @@ Below is the agreed plan. Write a skeleton. Do NOT implement any logic.
   be true about its output, regardless of input values
 - Transition table (if applicable): test every valid transition
   succeeds and every invalid transition is rejected
-
-### Plan
-[paste plan here]
-
 ```
 
-### PHASE 2 — SKELETON VERIFICATION (first time LLM sees this design)
+### PHASE 2 — EXECUTE
 
-```markdown
-Belown is the agreed plan. Restate my requirements before coding (happy path only).
-
-### Agreed plan:
-[paste the approved plan from Phase 1]
-
-### Requirements
-
-SCENARIOS:
-* Given → When → Then
-
-STATES:
-* State → [transition] → State
-
-CONSTRAINTS:
-* Top 3 from Rules.md that affect this plan
-
-No error handling, no edge cases. Flag any gaps.
+```other
+[current code (signatures + code to target)]
 ```
 
-### PHASE 3 — EXECUTE
+```other
+See attached skeleton.js and below code instructions.
 
-```markdown
-[upload Rules.md + current code (signatures + code to target)]
-```
+All tests are currently failing. Implement [concern]:
+functions X and Y. Do not change signatures, orchestration,
+or tests. Run tests when done.
 
-```markdown
-See attached Rules.md for full rules.
-Critical reminders: single file, under 100 lines, no error handling unless asked.
-
-See attached current.js.
-
-Implement step [N] only.
+### CODE INSTRUCTIONS
+- Single file, under 100 lines. If it can't fit, ask me to cut scope.
+- No error handling, logging, or types unless I ask for them.
+- No comments unless the logic is non-obvious.
+- If unclear, ask me — don't guess.
+- Review your output against the agreed plan and constraints.
+- Provide a terse commit message only with the changes made. Reference specific functions or code sections updated. EXAMPLE: "Enrich state objects (Timestamp, RowNumber, FileName), switch merge loops to ForEach-Object, and add 'file downloaded' to transition table."
 ```
 
 ```markdown
@@ -209,11 +203,17 @@ Fix only the failing functions. Do not change:
 
 Run tests after fixing. If still failing, explain what you
 tried and what you think is wrong.
-
-
 ```
 
 #### Agentic
+
+```markdown
+The skeleton includes a run_command orchestration function.
+It has tests like any other function. Implement it when its
+tests are next to pass. Do not put IO in run_command — IO
+stays in main() only.
+
+```
 
 ```markdown
 After implementing any concern, run tests immediately.
@@ -229,47 +229,3 @@ If tests fail:
 ```
 
 ### PHASE 4 — REFINE (per agent — use dedicated review, simplify, verify, or security agent)
-
-### RULES.md
-
-```markdown
-## CODE INSTRUCTIONS
-- Single file, under 100 lines. If it can't fit, ask me to cut scope.
-- No error handling, logging, or types unless I ask for them.
-- No comments unless the logic is non-obvious.
-- If unclear, ask me — don't guess.
-- Provide a terse commit message only with the changes made. Reference specific functions or code sections updated. EXAMPLE: "Enrich state objects (Timestamp, RowNumber, FileName), switch merge loops to ForEach-Object, and add 'file downloaded' to transition table."
-
-
-## PROCESS INSTRUCTIONS
-- Review your output against the agreed plan and constraints.
-- Be CRITICAL — pull no punches.
-- Be CREATIVE.
-- Explore 1-2 alternative approaches and decide on the best approach.
-  Briefly note at the end which alternatives you explored using this format:
-    - If you decide to [wire up a SQLite database hoping its query power
-      would pay off later], say "turn to page 42".
-      BEWARE: [you'll find yourself debugging schema migrations].
-    - If you decide to [go with browser localStorage betting on zero
-      back-end], say "turn to page 71".
-      BEWARE: [data vanishes when you clear the cache.]
-- Ask and answer any questions in terse bullets without large headings.
-```
-
-### System prompt for scenarios with limitations
-
-```markdown
-You are a code generator working under strict constraints.
-
-CRITICAL RULES:
-- Single file, under 100 lines. If it can't fit, ask me to cut scope.
-- No error handling, logging, types, or comments unless asked.
-- No abstractions "for later." Minimal dependencies.
-- If unclear, ask — don't guess.
-- Never change code I didn't ask you to change.
-
-PROCESS:
-- refer to the provided table of contents for the uploaded rules.md file to identify and use any relevant sections as you generate your response. Ensure your output aligns with the rules and guidelines in this document below as a table of contents.
-
-Rules.md - TABLE OF CONTENTS
-```
