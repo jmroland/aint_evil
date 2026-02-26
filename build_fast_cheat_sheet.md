@@ -26,7 +26,13 @@ After every LLM mistake:
 2. Write a one-line rule that prevents it.
 3. Add it to your constraints block permanently.
 
-## Workflow Optimizations
+## Base Workflow
+
+Plan → describe objective →  create given when then flow contract →  create development plan →  create skeleton with function signatures →  create property based tests →  hand off
+
+execute → implement one or more given when then →  implement entire skeleton → run →  errors →  revise →  run →  next →  complete skeleton
+
+# Workflow Optimizations
 
 ### Chatbot Workflow
 
@@ -49,6 +55,10 @@ suites that allow it to check its own work.
 1. Write a spec, plan, or acceptance criteria. EXAMPLE:
 
 `Given [precondition / current state] → When [user action or trigger] → Then [what happens + what the user sees]`
+
+1. Write a skeleton with function signatures thet have input and output types in comments, and a transition table as a data structure if used, plus orchestration wiring. Every function currently throws "Not implemented".  Write property based tests. For each function signature, generate 1-2 property-based tests that describe what should ALWAYS be true about its output, regardless of specific input values.
+
+For the transition table (if applicable), test every valid and every invalid transition.
 
 1. Embed plan in prompt template with `Rules.md`.
 2. Have LLM restate requirements (prompt in template).
@@ -78,7 +88,7 @@ and have it test its own work via browser, test suites, or bash.
 
 ### EXAMPLE Slash Commands, Aliases, and Local LLM Prompts
 
-```other
+```markdown
 alias t="clear && $TEST_CMD 2>&1 | tee /tmp/last-test.txt && cat /tmp/last-test.txt | pbcopy"
 cat prompt.txt | ollama run mistral "Does this prompt ask for exactly one change? Does it include constraints? Flag anything vague."
 diff old.js new.js | ollama run mistral "Write a one-line changelog entry for this change." >> changelog.txt
@@ -89,11 +99,11 @@ $TEST_CMD 2>&1 | ollama run mistral "Format this test output as a bug report: wh
 
 ### PHASE 1 — PLAN (no code yet)
 
-```other
+```markdown
 [upload Rules.md]
 ```
 
-```other
+```markdown
 See attached Rules.md for full rules.
 Critical reminders: single file, under 100 lines, no error handling unless asked.
 
@@ -116,29 +126,53 @@ Output the plan in this exact format:
 
 DONE WHEN: [observable behaviors that prove it works]
 
-FUNCTIONS:
-1. [function] — [purpose ≤10 words] — [inputs → outputs] — [side effects, if any] — [what user sees]
-
 STATES (if applicable):
 | State | Action/Guard | Next State | Enforced by |
 
-BUILD ORDER (max 9 steps):
-1. [what to build first and why]
+FUNCTIONS:
+1. [function] — [purpose ≤10 words] — [inputs → outputs] — [side effects, if any] — [what user sees]
 
 KEY ASSUMPTIONS: [any data shape, external API, or dependency the plan relies on]
 
 Happy path only. Ask if unclear. Do NOT write code.
 ```
 
-### PHASE 2 — SLICE 0 VERIFICATION (first time LLM sees this design)
+```markdown
+Below is the agreed plan. Write a skeleton. Do NOT implement any logic.
 
-```other
-Restate my requirements before coding (happy path only):
+### Skeleton Structure
+- Pure function signatures: data in → data out, no side effects
+- Input/output types noted in comments
+- Every function body: throw "not implemented"
+- Transition table (if applicable) as a data structure, enforced
+- Orchestration at top level as a pipeline: input → fn1 → fn2 → output (all side effects here only)
+- Use language idioms where significantly more robust, readable, or simple
 
-SCENARIOS (one per flow contract row):
+### Tests (generate alongside skeleton)
+- 1-2 property-based tests per function: what should ALWAYS
+  be true about its output, regardless of input values
+- Transition table (if applicable): test every valid transition
+  succeeds and every invalid transition is rejected
+
+### Plan
+[paste plan here]
+
+```
+
+### PHASE 2 — SKELETON VERIFICATION (first time LLM sees this design)
+
+```markdown
+Belown is the agreed plan. Restate my requirements before coding (happy path only).
+
+### Agreed plan:
+[paste the approved plan from Phase 1]
+
+### Requirements
+
+SCENARIOS:
 * Given → When → Then
 
-STATES (if applicable):
+STATES:
 * State → [transition] → State
 
 CONSTRAINTS:
@@ -149,41 +183,63 @@ No error handling, no edge cases. Flag any gaps.
 
 ### PHASE 3 — EXECUTE
 
-```other
+```markdown
 [upload Rules.md + current code (signatures + code to target)]
 ```
 
-```other
+```markdown
 See attached Rules.md for full rules.
 Critical reminders: single file, under 100 lines, no error handling unless asked.
 
 See attached current.js.
 
-Agreed plan:
-[paste the approved plan from Phase 1]
-
 Implement step [N] only.
+```
+
+```markdown
+Tests failed after implementing [concern]. Here is the output:
+
+[paste test output]
+
+Fix only the failing functions. Do not change:
+- Function signatures
+- Orchestration
+- Tests
+- Any passing code
+
+Run tests after fixing. If still failing, explain what you
+tried and what you think is wrong.
+
+
+```
+
+#### Agentic
+
+```markdown
+After implementing any concern, run tests immediately.
+If tests fail:
+1. Read the output. Fix only the failing functions.
+2. Do not change signatures, orchestration, tests, or passing code.
+3. Run tests again.
+4. Repeat until all tests pass or the same test fails 3 times.
+5. If stuck after 3 attempts, stop. Report: what failed, what you
+   tried, your best guess at root cause. Wait for user decision.
+
+
 ```
 
 ### PHASE 4 — REFINE (per agent — use dedicated review, simplify, verify, or security agent)
 
 ### RULES.md
 
-```other
+```markdown
 ## CODE INSTRUCTIONS
 - Single file, under 100 lines. If it can't fit, ask me to cut scope.
-- No mutation. Pure functions — data in, data out.
-- Side effects only at edges (DB, API, UI render). Everything else is pure transformation.
-- Orchestration at top level; pure functions for all logic.
-- Prefer map/filter/reduce over loops. Prefer const over let. No class unless unavoidable.
-- Minimal dependencies. No abstractions "for later."
 - No error handling, logging, or types unless I ask for them.
 - No comments unless the logic is non-obvious.
 - If unclear, ask me — don't guess.
-- Provide a terse commit message only with the changes made. Reference specific
-  functions or code sections updated. EXAMPLE: "Enrich state objects (Timestamp,
-  RowNumber, FileName), switch merge loops to ForEach-Object, and add
-  'file downloaded' to transition table."
+- Provide a terse commit message only with the changes made. Reference specific functions or code sections updated. EXAMPLE: "Enrich state objects (Timestamp, RowNumber, FileName), switch merge loops to ForEach-Object, and add 'file downloaded' to transition table."
+
 
 ## PROCESS INSTRUCTIONS
 - Review your output against the agreed plan and constraints.
@@ -207,21 +263,13 @@ You are a code generator working under strict constraints.
 
 CRITICAL RULES:
 - Single file, under 100 lines. If it can't fit, ask me to cut scope.
-- No mutation. Pure functions — data in, data out.
-- Side effects only at edges. Everything else is pure transformation.
 - No error handling, logging, types, or comments unless asked.
 - No abstractions "for later." Minimal dependencies.
 - If unclear, ask — don't guess.
 - Never change code I didn't ask you to change.
 
 PROCESS:
-- referred to the provided table of contents for the uploaded rules.md file to identify and use any relevant sections as you generate your response. Ensure your output aligns with the rules and guidelines in this document below as a table of contents.
+- refer to the provided table of contents for the uploaded rules.md file to identify and use any relevant sections as you generate your response. Ensure your output aligns with the rules and guidelines in this document below as a table of contents.
 
 Rules.md - TABLE OF CONTENTS
 ```
-
-## Contributions
-Ideas, improvements, and new prompts are welcome. Feel free to open an issue or submit a PR.
-
-## License
-GPLv3
