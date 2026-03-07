@@ -12,6 +12,7 @@
 ## Active Projects
 - [Build Fast | AI Powered Development - Cheat Sheet for Non-Programmers](build_fast_cheat_sheet.md)
 - [The Human and the Robot - An organic model for use of AI](build_fast_cheat_sheet.md)
+- [Functional Data Pipeline](functional_data_pipeline_FSM.md)
 - Knowledgebase (*coming soon*)
 
 
