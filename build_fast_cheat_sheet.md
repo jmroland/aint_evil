@@ -409,3 +409,5 @@ raise NotImplementedError
 | 6         | “Ready to ship?”                                           | Type hints, split files if needed                 |
 | 7         | Review / simplify / security                               | Apply fixes                                       |
 
+## License
+GPLv3

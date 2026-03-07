@@ -90,3 +90,6 @@ Rules.md non-negotiable rules are included in the system prompt / persona / agen
 ### Manifest 
 
 The manifest tells the LLM what exists (behaviors, signatures, states, assumptions) so it can scope or implement without seeing the full project, and serves as a design contract for implementation and quality control. The human collaborates with a planner LLM to modify the manifest, and the manifest represents the knobs and dials for the human.
+
+## License
+GPLv3
