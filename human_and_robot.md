@@ -1,12 +1,10 @@
-# The Human and the Robot - An organic model for use of AI 
-
 ## Overview
 
-A minimal framework that helps the human use AI strategically as a programmable collaborator to get work done and improve workflows, rather than exclusively using AI to help perform otherwise manual work. It organizes work around **structured context (memory), reusable thinking (knowledge), and command**-triggered **pipelines**. The system captures context specific constraints, injects frameworks/templates, and produces artifacts for re-use.
+A minimal framework that helps the human use AI strategically as a programmable collaborator to rather than as another tool for labor. It organizes work around **structured context (memory), reusable thinking (knowledge),** and **command**-triggered **pipelines**.
 
 **Slash commands** route tasks through lightweight pipelines using **contextual state cards (memory)** and **frameworks/templates (knowledge)** stored in a prescribed folder structure. Pipelines generate **artifacts** (docs, analyses, updates) and automatically update scope or add constraints to a specific context (such as a project, general task, or area of obligation).
 
-The system is built as a walking skeleton, used to build itself, and emphasizes quality and deterministic outputs wherever possible.
+The system is being built as a walking skeleton, used to build itself, and emphasizes quality and deterministic outputs wherever possible.
 
 ### Definitions
 
@@ -90,6 +88,3 @@ Rules.md non-negotiable rules are included in the system prompt / persona / agen
 ### Manifest 
 
 The manifest tells the LLM what exists (behaviors, signatures, states, assumptions) so it can scope or implement without seeing the full project, and serves as a design contract for implementation and quality control. The human collaborates with a planner LLM to modify the manifest, and the manifest represents the knobs and dials for the human.
-
-## License
-GPLv3
